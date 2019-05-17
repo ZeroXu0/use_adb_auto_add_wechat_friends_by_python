@@ -53,21 +53,22 @@ class Main:
         # list到一定长度 输出到文件
         if int(self._dump) == len(_list):
             self._file.dump(_list, key)
-
+	#zero自定义的 20190513
     def init(self):
         self._adb.click_by_text_after_refresh('通讯录')
-        self._adb.click_by_text_after_refresh('外部联系人')
-        self._adb.click_by_text_after_refresh('添加')
+        self._adb.click_by_text_after_refresh('新的朋友')
+        self._adb.click_by_text_after_refresh('添加朋友')
         self._adb.click_by_text_after_refresh('微信号/手机号')
 
     def add_friends(self, phone: str):
         print('===== 开始查找 ===== ' + phone + ' =====')
+        self._adb.refresh_nodes()
         self._adb.click_by_text_after_refresh('微信号/手机号')
 
         # 输入号码
         self._adb.adb_input(phone)
         # 点击搜索
-        self._adb.click_by_text_after_refresh('搜索：' + phone)
+        self._adb.click_by_text_after_refresh('搜索:' + phone)
         print('  ==> 点击搜索 ==>  ')
 
         self._adb.refresh_nodes()
@@ -154,48 +155,75 @@ class Main:
                 self.init()
 
         # 查找成功
-        elif self._adb.find_nodes_by_text('添加为联系人'):
-            self._adb.click(0)
-            self._adb.click_by_text_after_refresh('发送添加邀请')
+        #elif self._adb.find_nodes_by_text('添加为联系人'):
+        elif self._adb.find_nodes_by_text('添加到通讯录'):
+            #self._adb.click(0)
+            self._adb.click_by_text_after_refresh('添加到通讯录')
 
             self._adb.refresh_nodes()
-            if self._adb.find_nodes_by_text('发送添加邀请'):
-                print('  <== 发送失败 <==  ')
-                self.push('failed', phone + '发送失败')
+            if self._adb.find_nodes_by_text('发消息'):
+                print('  <== 已经是好友 无需再次添加 <==  ')
+                self.push('failed', phone + '已经是好友')
                 self._adb.adb_put_back()
                 self._adb.adb_put_back()
+                self._adb.refresh_nodes()
+            elif self._adb.find_nodes_by_text('发送'):
+                print('  <== 已发送请求 <==  ')
+                self._adb.click_by_text_after_refresh('发送')
+                self._adb.refresh_nodes()
+                if self._adb.find_nodes_by_text('发送'):
+                    print('  <== 化腾爸爸提醒你:操作太频繁了! <==  ')
+                    self.push('failed', phone + '操作太频繁了')
+                    self._adb.adb_put_back()
+                    self._adb.adb_put_back()
+                    self._adb.adb_put_back()
+                    self._adb.refresh_nodes()
+                else:
+                    self.push('success', phone + '发送成功')
+                    self._adb.adb_put_back()
+                    self._adb.adb_put_back()
+                    self._adb.refresh_nodes()
             else:
                 print(' !! <== 发送成功 <==  ')
                 self.push('success', phone + '发送成功')
                 self._adb.adb_put_back()
+                self._adb.refresh_nodes()
 
         elif self._adb.find_nodes_by_text('发消息'):
             print('  <== 已经是好友 无需再次添加 <==  ')
             self.push('failed', phone + '已经是好友')
             self._adb.adb_put_back()
+            self._adb.adb_put_back()
+            self._adb.refresh_nodes()
 
         elif self._adb.find_nodes_by_text('同时拥有微信和企业微信'):
             print('  <== 同时拥有微信和企业微信 <==  ')
             self.push('failed', phone + '同时拥有微信和企业微信')
             self._adb.adb_put_back()
+            self._adb.adb_put_back()
+            self._adb.refresh_nodes()
 
         elif self._adb.find_nodes_by_text('该用户不存在') or self._adb.find_nodes_by_text('被搜帐号状态异常，无法显示'):
             print('  <== 该用户不存在 或 帐号异常 <==  ')
             self.push('failed', phone + '该用户不存在 或 帐号异常')
             self._adb.adb_put_back()
+            self._adb.adb_put_back()
+            self._adb.refresh_nodes()
 
         # 清空已输入的字符
+        print('  直接返回到查找页  ')
         self._adb.refresh_nodes()
-        if self._adb.find_nodes('true', By.naf):
-            self._adb.click(1)
+        if self._adb.find_nodes_by_text('搜索'):
+            self._adb.click(0)
+            self._adb.refresh_nodes()
 
     def main(self):
         self.init()
-
         if 'file' == self._mode:
-            with self._file.open(self._file) as f:
+            with open(self._file) as f:
                 for line in f:
                     line = file.delete_line_breaks(line)
+                    time.sleep(5)
                     self.add_friends(line)
                 f.close()
         elif 'loop' == self._mode:
@@ -203,5 +231,6 @@ class Main:
                 self.add_friends(str(line))
 
         # 输出最后的添加结果
+        print('self._file类型:',type(self._file))
         self._file.dump(self._success, 'success')
         self._file.dump(self._failed, 'failed')
