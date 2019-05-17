@@ -2,32 +2,14 @@
 
 > 微信自动发送添加好友请求脚本 python
 
-## 使用指南
+## 使用准备
 
 * python version > 3.3
 * android手机打开usb调试
 * android手机允许模拟点击(一部分手机有 如小米6x)
 * 运行结果会以txt文件格式导出 (目录自动创建) ./result/${yyyyMMdd}/*.txt
 
-> python run.py
-> * 提示使用 python run.py -h 或 python run.py --help
 
-> python run.py -h
-> * 显示详细使用帮助 -h 或 --help
-> * 优先级最高 且与其他参数冲突
-
-> python run.py -d
-> * 使用adb的默认端口 和 默认设备(usb有且仅有一个android设备)
-> * 优先级第二 且与其他参数冲突
-
-> python run.py -s xxx
-> * 绑定adb操作的设备号 多设备适用
-
-> python run.py -p xxx
-> * 绑定adb运行的端口号 adb端口被占用适用(鲁大师 360手机助手等)
-
-> python run.py -p xxx -s xxx
-> * 绑定adb操作的设备号和运行的端口号
 
 ## 配置环境
 
@@ -48,7 +30,30 @@
     2. # virtualenv --no-site-packages venv <br>
  &nbsp;&nbsp;&nbsp; # virtualenv --no-site-packages -p /usr/bin/python3.7 venv <br>
     3. # ./venv/bin/python run.py -h
-    
+
+## 使用指南
+* 在环境配置无误,并且手机调试无问题之后,确保先将手机进入微信主界面
+
+> python run.py
+> * 提示使用 python run.py -h 或 python run.py --help
+
+> python run.py -h
+> * 显示详细使用帮助 -h 或 --help
+> * 优先级最高 且与其他参数冲突
+
+> python run.py -d
+> * 使用adb的默认端口 和 默认设备(usb有且仅有一个android设备)
+> * 优先级第二 且与其他参数冲突
+
+> python run.py -s xxx
+> * 绑定adb操作的设备号 多设备适用
+
+> python run.py -p xxx
+> * 绑定adb运行的端口号 adb端口被占用适用(鲁大师 360手机助手等)
+
+> python run.py -p xxx -s xxx
+> * 绑定adb操作的设备号和运行的端口号
+ 
 ## 技术堆栈
 
 > * 采用adb命令对android手机 模拟点击
